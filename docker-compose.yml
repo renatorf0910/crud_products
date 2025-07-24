@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ./product-api
+      dockerfile: Dockerfile
+    container_name: nest_api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./product-api:/app
+    
+  frontend:
+    build:
+      context: ./product-frontend
+      dockerfile: Dockerfile
+    container_name: react_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+    restart: always
