@@ -8,8 +8,6 @@ services:
     container_name: nest_api
     ports:
       - "3000:3000"
-    volumes:
-      - ./product-api:/app
     
   frontend:
     build:
