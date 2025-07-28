@@ -23,7 +23,7 @@ export default function ProductDialog({ open, onClose, product }: Props) {
   useEffect(() => {
     if (product) {
       setName(product.name);
-      setPrice(product.price.toString());
+      setPrice(product.price.toString().replace('.', ','));
       setSku(product.sku);
     } else {
       setName("");
@@ -34,10 +34,23 @@ export default function ProductDialog({ open, onClose, product }: Props) {
 
   const handleSubmit = async () => {
     try {
+      const parsedPrice = parseFloat(price.replace(",", "."));
+      if (isNaN(parsedPrice)) {
+        throw new Error("Preço inválido.");
+      }
+
       if (product) {
-        await api.put(`/products/${product.id}`, { name, price: parseFloat(price), sku });
+        await api.put(`/products/${product.id}`, {
+          name,
+          price: parsedPrice,
+          sku,
+        });
       } else {
-        await api.post("/products", { name, price: parseFloat(price), sku });
+        await api.post("/products", {
+          name,
+          price: parsedPrice,
+          sku,
+        });
       }
       onClose();
     } catch (error) {
@@ -66,9 +79,14 @@ export default function ProductDialog({ open, onClose, product }: Props) {
             fullWidth
             margin="dense"
             label="Preço"
-            type="number"
+            type="text"
             value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^[0-9]*[.,]?[0-9]*$/.test(value)) {
+                setPrice(value);
+              }
+            }}
           />
           <TextField
             fullWidth
